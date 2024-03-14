@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/components/ui/use-toast";
 import { Protect } from "@clerk/nextjs";
-import { useMutation } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import {
   FileIcon,
   MoreVertical,
@@ -42,6 +42,7 @@ export function FileCardActions({
   const deleteFile = useMutation(api.files.deleteFile);
   const restoreFile = useMutation(api.files.restoreFile);
   const toggleFavorite = useMutation(api.files.toggleFavorite);
+  const me = useQuery(api.users.getMe)
   const { toast } = useToast();
 
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
@@ -110,7 +111,7 @@ export function FileCardActions({
             condition={(check) => {
               return check({
                 role: "org:admin",
-              }); //|| file.userId === me?._id
+              }) || file.userId === me?._id
             }}
             fallback={<></>}
           >

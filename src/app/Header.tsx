@@ -6,12 +6,14 @@ import {
     SignedOut,
     UserButton,
 } from "@clerk/nextjs";
+import clsx from "clsx";
 import Image from "next/image";
 import Link from "next/link";
+import { FilesButton } from "./dashboard/side-nav";
 
 export function Header() {
   return (
-    <div className="border-b py-3 bg-gray-100 ">
+    <div className="relative z-10 border-b py-3 bg-gray-100 ">
       <div className="items-center container mx-auto justify-between flex">
         <Link href={"/"} className="flex gap-2 items-center text-lg">
           <Image
@@ -23,17 +25,12 @@ export function Header() {
           Colab Web
         </Link>
         <SignedIn>
-            <Button className="" variant={"ghost"}>
-                <Link href={"/dashboard/files"}>
-                Your Files
-            </Link>
-            </Button>
-            
+          <FilesButton />
         </SignedIn>
         
         <div className="flex gap-2">
           <OrganizationSwitcher />
-          <UserButton />
+          <UserButton  afterSignOutUrl="/"/>
           <SignedOut>
             <SignInButton>
               <Button>Sign In</Button>

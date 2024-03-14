@@ -1,9 +1,26 @@
 "use client"
 import { Button } from "@/components/ui/button";
 import clsx from "clsx";
-import { FilesIcon, StarIcon, Trash2Icon } from "lucide-react";
+import { FilesIcon, FolderIcon, FolderOpen, StarIcon, Trash2Icon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+
+export function FilesButton() {
+  const pathname = usePathname()
+  return(
+    <div>
+      <Link href={"/dashboard/files"}>
+      <Button variant={"link"} className={clsx("gap-2",  {
+        'text-cyan-800' : pathname.includes("/dashboard"),
+      })}>
+        <FolderIcon />
+        Your Files
+      </Button>
+    </Link>
+    </div>
+    
+  )
+}
 
 export function SideNav() {
     const pathname = usePathname()
