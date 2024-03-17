@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/card";
 import { useQuery } from "convex/react";
 import { formatRelative } from "date-fns";
-import { FileTextIcon, GanttChartIcon, ImageIcon } from "lucide-react";
+import { FileTextIcon, GanttChartIcon, ImageIcon, TextIcon } from "lucide-react";
 import Image from "next/image";
 import { ReactNode } from "react";
 import { api } from "../../../../convex/_generated/api";
@@ -54,6 +54,7 @@ export function FileCard({
 
         {file.type === "csv" && <GanttChartIcon className="w-20 h-20" />}
         {file.type === "pdf" && <FileTextIcon className="w-20 h-20" />}
+        {file.type === "txt" && <TextIcon className="w-20 h-20" />}
       </CardContent>
       <CardFooter className="flex justify-between">
         <div className="flex gap-2 text-xs text-gray-700 w-40 items-center">

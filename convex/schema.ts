@@ -1,7 +1,7 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
 
-export const fileTypes = v.union(v.literal("image"), v.literal("csv"), v.literal("pdf"))
+export const fileTypes = v.union(v.literal("image"), v.literal("csv"), v.literal("pdf"), v.literal("txt"))
 
 export const roles = v.union(v.literal("admin"), v.literal("member"));
 
