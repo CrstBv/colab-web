@@ -30,5 +30,11 @@ export default defineSchema({
       role: roles,
     }))
   }).index("by_tokenIdentifier", ["tokenIdentifier"]),
+  messages: defineTable({
+    body: v.string(),
+    orgId: v.string(),
+    userId: v.id("users"),
+    fileId: v.optional(v.id("files")),
+  }).index("by_orgId", ["orgId"])
 });
 

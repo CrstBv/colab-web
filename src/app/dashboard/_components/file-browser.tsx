@@ -21,17 +21,17 @@ import {
 import { Doc } from "../../../../convex/_generated/dataModel";
 import { Label } from "@/components/ui/label";
 
-function Placeholder({ title, image}: { title: string , image: string}) {
+function Placeholder({ message, image}: { message: string , image: string}) {
   return (
     <div className="flex flex-col gap-8 w-full items-center mt-24">
       <Image
-        alt="an image "
+        alt="an illustrative image for message"
         width="258"
         height="258"
         src={image}
       />
-      <div className="text-2xl">{title}</div>
-      {title === "You have no files, upload one now" ? <UploadButton /> : <></>}
+      <div className="text-2xl">{message}</div>
+      {message === "You have no files, upload one now" ? <UploadButton /> : <></>}
     </div>
   );
 }
@@ -83,9 +83,9 @@ export function FileBrowser({
     })) ?? [];
 
     const pageName = {
-      FilesPage: <Placeholder title="You have no files, upload one now" image="/no_data.svg"/>,
-      FavoritesPage: <Placeholder title="You have no favorite files" image="/no_favorites.svg"/>,
-      TrashPage: <Placeholder title="You have no files to delete" image="/no_trash.svg"/>,
+      FilesPage: <Placeholder message="You have no files, upload one now" image="/no_data.svg"/>,
+      FavoritesPage: <Placeholder message="You have no favorite files" image="/no_favorites.svg"/>,
+      TrashPage: <Placeholder message="You have no files to delete" image="/no_trash.svg"/>,
     }
 
   return (
