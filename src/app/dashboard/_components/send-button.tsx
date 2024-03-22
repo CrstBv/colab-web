@@ -28,83 +28,84 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { Doc } from "../../../../convex/_generated/dataModel";
 import { useGetOrgIdUserId } from "./overview-content";
 
 const formSchema = z.object({
-  title: z.string().min(1).max(200),
-  file: z
-    .custom<FileList>((val) => val instanceof FileList, "Required")
-    .refine((files) => files.length > 0, `Required`),
+  title: z.string().min(1, "Title most have at least 1 character").max(150),
+  body: z.string().max(200),
 });
 
-export function UploadButton() {
+
+export function SendButton({
+  title,
+  type,
+}: {
+  title: string;
+  type: "Advise" | "Note";
+}) {
   const { toast } = useToast();
 
   const orgId = useGetOrgIdUserId();
-  const generateUploadUrl = useMutation(api.files.generateUploadUrl);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       title: "",
-      file: undefined,
+      body: "",
     },
   });
-
-  const fileRef = form.register("file");
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     if (!orgId) return;
 
-    const postUrl = await generateUploadUrl();
+    if (type === "Advise") {
+      try {
+        await createAdvise({ title: values.title, body: values.body, orgId });
+        form.reset();
 
-    const fileType = values.file[0].type;
+        setIsFileDialogOpen(false);
 
-    const result = await fetch(postUrl, {
-      method: "POST",
-      headers: { "Content-Type": fileType },
-      body: values.file[0],
-    });
-    const { storageId } = await result.json();
+        toast({
+          variant: "success",
+          title: "Advise created",
+          description: "Now everyone can view your advise",
+        });
+      } catch (err) {
+        toast({
+          variant: "destructive",
+          title: "Something went wrong",
+          description: "Your advise could not be created, try again later",
+        });
+      }
+    }
 
-    const types = {
-      "image/png": "image",
-      "image/jpeg": "image",
-      "text/plain": "txt",
-      "application/pdf": "pdf",
-      "text/csv": "csv",
-    } as Record<string, Doc<"files">["type"]>;
+    if (type === "Note") {
+      try {
+        await createNote({ title: values.title, body: values.body });
+        form.reset();
 
-    try {
-      await createFile({
-        name: values.title,
-        fileId: storageId,
-        orgId,
-        type: types[fileType],
-      });
+        setIsFileDialogOpen(false);
 
-      form.reset();
-
-      setIsFileDialogOpen(false);
-
-      toast({
-        variant: "success",
-        title: "File Uploaded",
-        description: "Now everyone can view your file",
-      });
-    } catch (err) {
-      toast({
-        variant: "destructive",
-        title: "Something went wrong",
-        description: "Your file could not be uploaded, try again later",
-      });
+        toast({
+          variant: "success",
+          title: "Note created",
+          description: "Now you can view your note",
+        });
+      } catch (err) {
+        toast({
+          variant: "destructive",
+          title: "Something went wrong",
+          description: "Your note could not be created, try again later",
+        });
+      }
     }
   }
 
   const [isFileDialogOpen, setIsFileDialogOpen] = useState(false);
 
-  const createFile = useMutation(api.files.createFile);
+  const createAdvise = useMutation(api.advises.createAdvise);
+
+  const createNote = useMutation(api.notes.createNote);
 
   return (
     <Dialog
@@ -115,14 +116,17 @@ export function UploadButton() {
       }}
     >
       <DialogTrigger asChild>
-        <Button>Upload File</Button>
+        <Button>{title}</Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle className="mb-8">Upload your File Here</DialogTitle>
-          <DialogDescription>
-            This file will be accessible by anyone in your organization
-          </DialogDescription>
+          <DialogTitle className="mb-3">Create your {type} here</DialogTitle>
+          {type === "Advise" ? (<DialogDescription>
+            This advise will be shown to anyone in your organization
+          </DialogDescription>) : ( <DialogDescription>
+            This note will be available only for you
+          </DialogDescription>)
+          }
         </DialogHeader>
 
         <div>
@@ -141,20 +145,20 @@ export function UploadButton() {
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
-                name="file"
-                render={() => (
+                name="body"
+                render={({ field }) => (
                   <FormItem>
-                    <FormLabel>File</FormLabel>
+                    <FormLabel>Description</FormLabel>
                     <FormControl>
-                      <Input type="file" {...fileRef} />
+                      <Input {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
               <Button
                 type="submit"
                 disabled={form.formState.isSubmitting}

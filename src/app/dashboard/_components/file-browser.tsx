@@ -1,16 +1,5 @@
 "use client";
-import { useOrganization, useUser } from "@clerk/nextjs";
-import { useQuery } from "convex/react";
-import { api } from "../../../../convex/_generated/api";
-import { UploadButton } from "./upload-button";
-import { FileCard } from "./file-card";
-import Image from "next/image";
-import { GridIcon, Loader2, RowsIcon, TableIcon } from "lucide-react";
-import { SearchBar } from "./search-bar";
-import { useState } from "react";
-import { DataTable } from "./file-table";
-import { columns } from "./columns";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Label } from "@/components/ui/label";
 import {
   Select,
   SelectContent,
@@ -18,20 +7,41 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useQuery } from "convex/react";
+import { GridIcon, Loader2, RowsIcon } from "lucide-react";
+import Image from "next/image";
+import { useState } from "react";
+import { api } from "../../../../convex/_generated/api";
 import { Doc } from "../../../../convex/_generated/dataModel";
-import { Label } from "@/components/ui/label";
+import { columns } from "./columns";
+import { FileCard } from "./file-card";
+import { DataTable } from "./file-table";
+import { useGetOrgIdUserId } from "./overview-content";
+import { SearchBar } from "./search-bar";
+import { UploadButton } from "./upload-button";
 
-function Placeholder({ message, image}: { message: string , image: string}) {
+export function Placeholder({
+  message,
+  image,
+}: {
+  message: string;
+  image: string;
+}) {
   return (
-    <div className="flex flex-col gap-8 w-full items-center mt-24">
+    <div className="flex flex-col gap-5 w-full items-center mt-14">
       <Image
         alt="an illustrative image for message"
-        width="258"
-        height="258"
+        width="215"
+        height="215"
         src={image}
       />
       <div className="text-2xl">{message}</div>
-      {message === "You have no files, upload one now" ? <UploadButton /> : <></>}
+      {message === "You have no files, upload one now" ? (
+        <UploadButton />
+      ) : (
+        <></>
+      )}
     </div>
   );
 }
@@ -45,15 +55,10 @@ export function FileBrowser({
   favoritesOnly?: boolean;
   deletedOnly?: boolean;
 }) {
-  const organization = useOrganization();
-  const user = useUser();
   const [query, setQuery] = useState("");
   const [type, setType] = useState<Doc<"files">["type"] | "all">("all");
 
-  let orgId: string | undefined = undefined;
-  if (organization.isLoaded && user.isLoaded) {
-    orgId = organization.organization?.id ?? user.user?.id;
-  }
+  const orgId = useGetOrgIdUserId();
 
   const favorites = useQuery(
     api.files.getAllFavorites,
@@ -82,11 +87,26 @@ export function FileBrowser({
       ),
     })) ?? [];
 
-    const pageName = {
-      FilesPage: <Placeholder message="You have no files, upload one now" image="/no_data.svg"/>,
-      FavoritesPage: <Placeholder message="You have no favorite files" image="/no_favorites.svg"/>,
-      TrashPage: <Placeholder message="You have no files to delete" image="/no_trash.svg"/>,
-    }
+  const pageName = {
+    FilesPage: (
+      <Placeholder
+        message="You have no files, upload one now"
+        image="/no_data.svg"
+      />
+    ),
+    FavoritesPage: (
+      <Placeholder
+        message="You have no favorite files"
+        image="/no_favorites.svg"
+      />
+    ),
+    TrashPage: (
+      <Placeholder
+        message="You have no files to delete"
+        image="/no_trash.svg"
+      />
+    ),
+  };
 
   return (
     <div>
@@ -126,6 +146,7 @@ export function FileBrowser({
                 <SelectItem value="image">Image</SelectItem>
                 <SelectItem value="csv">CSV</SelectItem>
                 <SelectItem value="pdf">PDF</SelectItem>
+                <SelectItem value="txt">TXT</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -150,15 +171,12 @@ export function FileBrowser({
         </TabsContent>
       </Tabs>
 
-      {files?.length === 0 && (
-        deletedOnly ? (
-          pageName.TrashPage
-        ) : favoritesOnly ? (
-          pageName.FavoritesPage
-        ) : (
-          pageName.FilesPage
-        )
-      )}
+      {files?.length === 0 &&
+        (deletedOnly
+          ? pageName.TrashPage
+          : favoritesOnly
+          ? pageName.FavoritesPage
+          : pageName.FilesPage)}
     </div>
   );
 }

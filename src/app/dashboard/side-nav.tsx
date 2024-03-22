@@ -7,11 +7,15 @@ import {
   FolderIcon,
   FolderOpen,
   MessageSquareIcon,
+  NotebookIcon,
   StarIcon,
   Trash2Icon,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useGetOrgIdUserId } from "./_components/overview-content";
+import { api } from "../../../convex/_generated/api";
+import { useQuery } from "convex/react";
 
 export function FilesButton() {
   const pathname = usePathname();
@@ -33,6 +37,9 @@ export function FilesButton() {
 }
 
 export function SideNav() {
+  const orgId = useGetOrgIdUserId();
+
+  const members = useQuery(api.users.getOrgMembers, orgId ? { orgId } : "skip");
   const pathname = usePathname();
   return (
     <div className="w-40 flex flex-col gap-2">
@@ -42,11 +49,28 @@ export function SideNav() {
             "text-cyan-500": pathname.includes("/dashboard/overview"),
           })}><ClipboardListIcon />Overview</Button>
       </Link>
+      {members && members.length > 0 ? (<Link href={"/dashboard/chat"}>
+        <Button  variant={"link"}
+          className={clsx("gap-2", {
+            "text-cyan-500": pathname.includes("/dashboard/chat"),
+          })}>
+            <MessageSquareIcon />Chat
+            </Button>
+      </Link>): (<Link href={"/dashboard/notes"}>
+        <Button  variant={"link"}
+          className={clsx("gap-2", {
+            "text-cyan-500": pathname.includes("/dashboard/chat"),
+          })}>
+            <NotebookIcon />Notes
+            </Button>
+      </Link>)}
       <Link href={"/dashboard/chat"}>
         <Button  variant={"link"}
           className={clsx("gap-2", {
             "text-cyan-500": pathname.includes("/dashboard/chat"),
-          })}><MessageSquareIcon />Chat</Button>
+          })}>
+            <MessageSquareIcon />Chat
+            </Button>
       </Link>
       <Link href={"/dashboard/files"}>
         <Button

@@ -1,4 +1,4 @@
-import { Doc, Id } from "../../../../convex/_generated/dataModel";
+import { Doc } from "../../../../convex/_generated/dataModel";
 
 import {
   AlertDialog,
@@ -42,7 +42,9 @@ export function FileCardActions({
   const deleteFile = useMutation(api.files.deleteFile);
   const restoreFile = useMutation(api.files.restoreFile);
   const toggleFavorite = useMutation(api.files.toggleFavorite);
-  const me = useQuery(api.users.getMe)
+  const fileId = file.fileId;
+  const fileUrl = useQuery(api.files.getFileUrl, fileId ? { fileId } : "skip");
+  const me = useQuery(api.users.getMe);
   const { toast } = useToast();
 
   const [isConfirmOpen, setIsConfirmOpen] = useState(false);
@@ -80,15 +82,15 @@ export function FileCardActions({
           <MoreVertical />
         </DropdownMenuTrigger>
         <DropdownMenuContent>
-          <DropdownMenuItem 
-          onClick={() => {
-            window.open(getFileUrl(file.fileId), "_blank");
-          }}
-          className="flex gap-1 items-center cursor-pointer"
+          <DropdownMenuItem
+            onClick={() => {
+              window.open(fileUrl, "_blank");
+            }}
+            className="flex gap-1 items-center cursor-pointer"
           >
-          <FileIcon className="w-4 h-4" /> Download
+            <FileIcon className="w-4 h-4" /> Download
           </DropdownMenuItem>
-        
+
           <DropdownMenuItem
             onClick={() => {
               toggleFavorite({
@@ -109,23 +111,26 @@ export function FileCardActions({
           </DropdownMenuItem>
           <Protect
             condition={(check) => {
-              return check({
-                role: "org:admin",
-              }) || file.userId === me?._id
+              return (
+                check({
+                  role: "org:admin",
+                }) || file.userId === me?._id
+              );
             }}
             fallback={<></>}
           >
             <DropdownMenuSeparator />
             <DropdownMenuItem
               onClick={() => {
-                if(file.shouldDelete) {
-                  restoreFile( {
-                    fileId: file._id
-                  })
+                if (file.shouldDelete) {
+                  restoreFile({
+                    fileId: file._id,
+                  });
                 } else {
-                  setIsConfirmOpen(true)
+                  setIsConfirmOpen(true);
                 }
-              setIsConfirmOpen(true)}}
+                setIsConfirmOpen(true);
+              }}
               className="flex gap-1 items-center cursor-pointer"
             >
               {file.shouldDelete ? (
@@ -143,7 +148,4 @@ export function FileCardActions({
       </DropdownMenu>
     </>
   );
-}
-export function getFileUrl(fileId: Id<"_storage">): string {
-  return `${process.env.NEXT_PUBLIC_CONVEX_URL}/api/storage/${fileId}`;
 }

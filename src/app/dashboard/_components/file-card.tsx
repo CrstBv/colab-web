@@ -2,25 +2,31 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle,
+  CardTitle
 } from "@/components/ui/card";
 import { useQuery } from "convex/react";
 import { formatRelative } from "date-fns";
-import { FileTextIcon, GanttChartIcon, ImageIcon, TextIcon } from "lucide-react";
+import {
+  FileTextIcon,
+  GanttChartIcon,
+  ImageIcon,
+  TextIcon,
+} from "lucide-react";
 import Image from "next/image";
 import { ReactNode } from "react";
 import { api } from "../../../../convex/_generated/api";
 import { Doc } from "../../../../convex/_generated/dataModel";
-import { FileCardActions, getFileUrl } from "./file-actions";
+import { FileCardActions } from "./file-actions";
 
 export function FileCard({
   file,
 }: {
   file: Doc<"files"> & { isFavorited: boolean };
 }) {
+  const fileId = file.fileId;
+  const fileUrl = useQuery(api.files.getFileUrl, fileId ? { fileId } : "skip");
   const userProfile = useQuery(api.users.getUserProfile, {
     userId: file.userId,
   });
@@ -29,6 +35,7 @@ export function FileCard({
     image: <ImageIcon />,
     pdf: <FileTextIcon />,
     csv: <GanttChartIcon />,
+    txt: <TextIcon />,
   } as Record<Doc<"files">["type"], ReactNode>;
 
   return (
@@ -42,14 +49,14 @@ export function FileCard({
           <FileCardActions isFavorited={file.isFavorited} file={file} />
         </div>
       </CardHeader>
-      <CardContent className="h-[200px] flex justify-center items-center">
-        {file.type === "image" && (
-          <Image
-            alt={file.name}
-            width="200"
-            height="100"
-            src={getFileUrl(file.fileId)}
-          />
+      <CardContent
+        className="h-[200px] flex justify-center items-center hover:cursor-pointer"
+        onClick={() => {
+          window.open(fileUrl, "_blank");
+        }}
+      >
+        {fileUrl && file.type === "image" && (
+          <Image alt={file.name} width="200" height="100" src={fileUrl} />
         )}
 
         {file.type === "csv" && <GanttChartIcon className="w-20 h-20" />}

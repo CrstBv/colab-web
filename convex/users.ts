@@ -52,12 +52,12 @@ export const updateUser = internalMutation({
 });
 
 export const addOrgIdToUser = internalMutation({
-  args: { tokenIdentifier: v.string(), orgId: v.string(), role: roles },
+  args: { tokenIdentifier: v.string(),orgName: v.string(), orgId: v.string(), role: roles },
   handler: async (ctx, args) => {
     const user = await getUser(ctx, args.tokenIdentifier);
 
     await ctx.db.patch(user._id, {
-      orgIds: [...user.orgIds, { orgId: args.orgId, role: args.role }],
+      orgIds: [...user.orgIds, { orgName: args.orgName, orgId: args.orgId, role: args.role }],
     });
   },
 });
@@ -81,6 +81,37 @@ export const updateRoleInOrgForUser = internalMutation({
   },
 });
 
+export async function hasAccessToOrg(
+  ctx: QueryCtx | MutationCtx,
+  orgId: string
+) {
+  const identity = await ctx.auth.getUserIdentity();
+
+  if (!identity) {
+    return null;
+  }
+
+  const user = await ctx.db
+    .query("users")
+    .withIndex("by_tokenIdentifier", (q) =>
+      q.eq("tokenIdentifier", identity.tokenIdentifier)
+    )
+    .first();
+
+  if (!user) {
+    return null;
+  }
+
+  const hasAccess =
+    user.orgIds.some((item) => item.orgId === orgId) ||
+    user.tokenIdentifier.includes(orgId);
+
+  if (!hasAccess) {
+    return null;
+  }
+
+  return { user };
+}
 
 export const getUserProfile = query({
   args: { userId: v.id("users")},
@@ -112,3 +143,31 @@ export const getMe = query({
       return user
   }
 })
+
+export const getOrgMembers = query({
+  args: { orgId: v.string()},
+  async handler(ctx, args) {
+    const orgId = args.orgId;
+
+    if (!orgId) {
+      throw new ConvexError("orgId expected");
+    }
+
+    const user = await hasAccessToOrg(ctx, args.orgId)
+    if(!user) {
+      return null
+    }
+
+    const orgName = user.user.orgIds[0].orgName
+
+    const orgMembers = await ctx.db
+      .query("users")
+      .filter((q) => q.or(q.eq(q.field("orgIds"), [{orgId, orgName , role: "admin"}]),q.eq(q.field("orgIds"), [{orgId, orgName, role: "member"}])))
+      .collect();
+    if (!orgMembers) {
+      return [];
+    }
+
+    return orgMembers;
+  },
+});

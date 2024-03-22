@@ -13,8 +13,8 @@ import { FilesButton } from "./dashboard/side-nav";
 
 export function Header() {
   return (
-    <div className="relative z-10 border-b py-3 bg-gray-100 ">
-      <div className="items-center container mx-auto justify-between flex">
+    <div className="relative z-10 border-b py-3 bg-gray-100">
+      <div className="flex items-center container mx-auto justify-between">
         <Link href={"/"} className="flex gap-2 items-center text-lg">
           <Image
             src={"/logo.svg"}

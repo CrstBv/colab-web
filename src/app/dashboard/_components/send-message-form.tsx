@@ -15,6 +15,7 @@ import { Loader2Icon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { api } from "../../../../convex/_generated/api";
+import { useGetOrgIdUserId } from "./overview-content";
 
 const formSchema = z.object({
   body: z.string().min(1).max(200),
@@ -22,12 +23,8 @@ const formSchema = z.object({
 
 export function SendMessageForm() {
   const sendMessage = useMutation(api.messages.sendMessage);
-  const organization = useOrganization();
-  const user = useUser();
-  let orgId: string | undefined = undefined;
-  if (organization.isLoaded && user.isLoaded) {
-    orgId = organization.organization?.id ?? user.user?.id;
-  }
+  
+  const orgId = useGetOrgIdUserId()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),

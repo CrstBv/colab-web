@@ -8,6 +8,7 @@ import {
   query,
 } from "./_generated/server";
 import { fileTypes } from "./schema";
+import { hasAccessToOrg } from "./users";
 
 export const generateUploadUrl = mutation(async (ctx) => {
   const identity = await ctx.auth.getUserIdentity();
@@ -17,39 +18,22 @@ export const generateUploadUrl = mutation(async (ctx) => {
   }
 
   return await ctx.storage.generateUploadUrl();
+
 });
 
-export async function hasAccessToOrg(
-  ctx: QueryCtx | MutationCtx,
-  orgId: string
-) {
-  const identity = await ctx.auth.getUserIdentity();
+export const getFileUrl = query({
+  args: {fileId: v.id("_storage")},
+  async handler(ctx, args) {
+    const fileUrl = await ctx.storage.getUrl(args.fileId)
 
-  if (!identity) {
-    return null;
+    if(fileUrl === null) {
+      throw new ConvexError("Something went wrong while getting fileUrl")
+    }
+
+    return fileUrl
   }
+})
 
-  const user = await ctx.db
-    .query("users")
-    .withIndex("by_tokenIdentifier", (q) =>
-      q.eq("tokenIdentifier", identity.tokenIdentifier)
-    )
-    .first();
-
-  if (!user) {
-    return null;
-  }
-
-  const hasAccess =
-    user.orgIds.some((item) => item.orgId === orgId) ||
-    user.tokenIdentifier.includes(orgId);
-
-  if (!hasAccess) {
-    return null;
-  }
-
-  return { user };
-}
 
 export const createFile = mutation({
   args: {
@@ -64,6 +48,7 @@ export const createFile = mutation({
     if (!hasAccess) {
       throw new ConvexError("you do not have access to this org");
     }
+
 
     await ctx.db.insert("files", {
       name: args.name,
@@ -243,6 +228,21 @@ export const getAllFavorites = query({
   },
 });
 
+export const getLastFiles = query({
+  args: {orgId: v.string()},
+  async handler(ctx, args) {
+    let lastFiles = await ctx.db
+    .query("files")
+    .withIndex("by_orgId", (q) => q.eq("orgId", args.orgId))
+    .order("desc")
+    .take(4);
+
+    lastFiles = lastFiles.filter((file) => !file.shouldDelete);
+
+    return lastFiles
+  }
+})
+
 async function hasAccessToFile(
   ctx: QueryCtx | MutationCtx,
   fileId: Id<"files">
@@ -261,3 +261,4 @@ async function hasAccessToFile(
 
   return { user: hasAccess.user, file };
 }
+
