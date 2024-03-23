@@ -1,11 +1,11 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import clsx from "clsx";
+import { useQuery } from "convex/react";
 import {
   ClipboardListIcon,
   FilesIcon,
   FolderIcon,
-  FolderOpen,
   MessageSquareIcon,
   NotebookIcon,
   StarIcon,
@@ -13,9 +13,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useGetOrgIdUserId } from "./_components/overview-content";
 import { api } from "../../../convex/_generated/api";
-import { useQuery } from "convex/react";
+import { useGetOrgIdUserId } from "./_components/overview-content";
 
 export function FilesButton() {
   const pathname = usePathname();
@@ -44,34 +43,40 @@ export function SideNav() {
   return (
     <div className="w-40 flex flex-col gap-2">
       <Link href={"/dashboard/overview"}>
-        <Button  variant={"link"}
+        <Button
+          variant={"link"}
           className={clsx("gap-2", {
             "text-cyan-500": pathname.includes("/dashboard/overview"),
-          })}><ClipboardListIcon />Overview</Button>
+          })}
+        >
+          <ClipboardListIcon />
+          Overview
+        </Button>
       </Link>
-      {members && members.length > 0 ? (<Link href={"/dashboard/chat"}>
-        <Button  variant={"link"}
+      <Link href={"/dashboard/notes"}>
+        <Button
+          variant={"link"}
           className={clsx("gap-2", {
-            "text-cyan-500": pathname.includes("/dashboard/chat"),
-          })}>
-            <MessageSquareIcon />Chat
-            </Button>
-      </Link>): (<Link href={"/dashboard/notes"}>
-        <Button  variant={"link"}
-          className={clsx("gap-2", {
-            "text-cyan-500": pathname.includes("/dashboard/chat"),
-          })}>
-            <NotebookIcon />Notes
-            </Button>
-      </Link>)}
-      <Link href={"/dashboard/chat"}>
-        <Button  variant={"link"}
-          className={clsx("gap-2", {
-            "text-cyan-500": pathname.includes("/dashboard/chat"),
-          })}>
-            <MessageSquareIcon />Chat
-            </Button>
+            "text-cyan-500": pathname.includes("/dashboard/notes"),
+          })}
+        >
+          <NotebookIcon />
+          Notes
+        </Button>
       </Link>
+      {members && members.length > 0 && (
+        <Link href={"/dashboard/chat"}>
+          <Button
+            variant={"link"}
+            className={clsx("gap-2", {
+              "text-cyan-500": pathname.includes("/dashboard/chat"),
+            })}
+          >
+            <MessageSquareIcon />
+            Chat
+          </Button>
+        </Link>
+      )}
       <Link href={"/dashboard/files"}>
         <Button
           variant={"link"}

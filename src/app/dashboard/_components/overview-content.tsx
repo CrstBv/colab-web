@@ -8,7 +8,7 @@ import { OrgMembers } from "./org-members";
 import Link from "next/link";
 import { FilesIcon } from "lucide-react";
 import { SendButton } from "./send-button";
-import { CarouselSize } from "./over-carousel";
+import { DataCarousel } from "./overview-carousel";
 
 export default function OverviewContent() {
   const orgId = useGetOrgIdUserId();
@@ -23,9 +23,8 @@ export default function OverviewContent() {
         <h1 className="text-3xl font-bold">{members[0].orgIds[0].orgName}</h1>
           <div className="w-full h-80 mt-3 flex justify-between">
             <div className="flex flex-col items-center w-full">
-              <h2>Last Advises </h2>
-              
-              <CarouselSize />
+              <h2 className="text-lg font-semibold">Last Advises </h2>
+              <DataCarousel />
               <SendButton title="Send Advise" type="Advise"/>
             </div>
             <div className="flex flex-col min-w-[270px]">
@@ -56,7 +55,7 @@ export default function OverviewContent() {
           <div className="w-full h-80 mt-6">
             <div className="flex flex-col justify-center items-center">
               <h2>Your last Notes</h2>
-              <CarouselSize />
+              <DataCarousel />
               <SendButton title="Create Note" type="Note"/>
             </div>
           </div>
