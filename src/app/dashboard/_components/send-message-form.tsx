@@ -8,14 +8,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useOrganization, useUser } from "@clerk/nextjs";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "convex/react";
 import { Loader2Icon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { api } from "../../../../convex/_generated/api";
-import { useGetOrgIdUserId } from "./overview-content";
+import { GetOrgIdUserId } from "./overview-content";
 
 const formSchema = z.object({
   body: z.string().min(1).max(200),
@@ -23,8 +22,8 @@ const formSchema = z.object({
 
 export function SendMessageForm() {
   const sendMessage = useMutation(api.messages.sendMessage);
-  
-  const orgId = useGetOrgIdUserId()
+
+  const orgId = GetOrgIdUserId();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),

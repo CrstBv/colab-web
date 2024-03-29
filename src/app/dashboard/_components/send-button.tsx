@@ -28,13 +28,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useGetOrgIdUserId } from "./overview-content";
+import { GetOrgIdUserId } from "./overview-content";
 
 const formSchema = z.object({
   title: z.string().min(1, "Title most have at least 1 character").max(150),
   body: z.string().max(200),
 });
-
 
 export function SendButton({
   title,
@@ -45,7 +44,7 @@ export function SendButton({
 }) {
   const { toast } = useToast();
 
-  const orgId = useGetOrgIdUserId();
+  const orgId = GetOrgIdUserId();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -63,7 +62,7 @@ export function SendButton({
         await createAdvise({ title: values.title, body: values.body, orgId });
         form.reset();
 
-        setIsFileDialogOpen(false);
+        setIsDialogOpen(false);
 
         toast({
           variant: "success",
@@ -81,10 +80,10 @@ export function SendButton({
 
     if (type === "Note") {
       try {
-        await createNote({ title: values.title, body: values.body });
+        await createNote({ title: values.title, body: values.body, orgId });
         form.reset();
 
-        setIsFileDialogOpen(false);
+        setIsDialogOpen(false);
 
         toast({
           variant: "success",
@@ -101,7 +100,7 @@ export function SendButton({
     }
   }
 
-  const [isFileDialogOpen, setIsFileDialogOpen] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
   const createAdvise = useMutation(api.advises.createAdvise);
 
@@ -109,9 +108,9 @@ export function SendButton({
 
   return (
     <Dialog
-      open={isFileDialogOpen}
+      open={isDialogOpen}
       onOpenChange={(isOpen) => {
-        setIsFileDialogOpen(isOpen);
+        setIsDialogOpen(isOpen);
         form.reset();
       }}
     >
@@ -121,12 +120,15 @@ export function SendButton({
       <DialogContent>
         <DialogHeader>
           <DialogTitle className="mb-3">Create your {type} here</DialogTitle>
-          {type === "Advise" ? (<DialogDescription>
-            This advise will be shown to anyone in your organization
-          </DialogDescription>) : ( <DialogDescription>
-            This note will be available only for you
-          </DialogDescription>)
-          }
+          {type === "Advise" ? (
+            <DialogDescription>
+              This advise will be shown to anyone in your organization
+            </DialogDescription>
+          ) : (
+            <DialogDescription>
+              This note will be available only for you
+            </DialogDescription>
+          )}
         </DialogHeader>
 
         <div>

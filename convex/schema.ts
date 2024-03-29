@@ -28,10 +28,10 @@ export default defineSchema({
     orgIds: v.array(v.object({
       orgName: v.optional(v.string()),
       orgId: v.string(),
-      role: roles,
+      role: v.optional(roles),
     }))
   }).index("by_tokenIdentifier", ["tokenIdentifier"])
-    .index("by_orgIds", ["orgIds"]),
+  .index("by_orgIds", ["orgIds"]),
   messages: defineTable({
     body: v.string(),
     orgId: v.string(),
@@ -47,6 +47,7 @@ export default defineSchema({
     title: v.string(),
     body: v.string(),
     userId: v.id("users"),
-  }).index("by_userId", ["userId"])
+    orgId: v.string(),
+  }).index("by_orgId", ["orgId"]),
 });
 

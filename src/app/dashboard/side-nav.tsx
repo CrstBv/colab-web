@@ -14,7 +14,7 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { api } from "../../../convex/_generated/api";
-import { useGetOrgIdUserId } from "./_components/overview-content";
+import { GetOrgIdUserId } from "./_components/overview-content";
 
 export function FilesButton() {
   const pathname = usePathname();
@@ -36,7 +36,7 @@ export function FilesButton() {
 }
 
 export function SideNav() {
-  const orgId = useGetOrgIdUserId();
+  const orgId = GetOrgIdUserId();
 
   const members = useQuery(api.users.getOrgMembers, orgId ? { orgId } : "skip");
   const pathname = usePathname();

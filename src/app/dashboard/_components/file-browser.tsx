@@ -17,7 +17,7 @@ import { Doc } from "../../../../convex/_generated/dataModel";
 import { columns } from "./columns";
 import { FileCard } from "./file-card";
 import { DataTable } from "./file-table";
-import { useGetOrgIdUserId } from "./overview-content";
+import { GetOrgIdUserId } from "./overview-content";
 import { SearchBar } from "./search-bar";
 import { UploadButton } from "./upload-button";
 
@@ -58,7 +58,7 @@ export function FileBrowser({
   const [query, setQuery] = useState("");
   const [type, setType] = useState<Doc<"files">["type"] | "all">("all");
 
-  const orgId = useGetOrgIdUserId();
+  const orgId = GetOrgIdUserId();
 
   const favorites = useQuery(
     api.files.getAllFavorites,

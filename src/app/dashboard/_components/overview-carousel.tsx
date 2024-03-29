@@ -9,10 +9,10 @@ import {
 } from "@/components/ui/carousel";
 import { useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
-import { useGetOrgIdUserId } from "./overview-content";
+import { GetOrgIdUserId } from "./overview-content";
 
 export function DataCarousel() {
-  const orgId = useGetOrgIdUserId();
+  const orgId = GetOrgIdUserId();
 
   const members = useQuery(api.users.getOrgMembers, orgId ? { orgId } : "skip");
 
@@ -21,7 +21,7 @@ export function DataCarousel() {
     orgId ? { orgId } : "skip"
   );
 
-  const notes = useQuery(api.notes.getLastNotes);
+  const notes = useQuery(api.notes.getLastNotes, orgId ? { orgId } : "skip");
 
   return (
     <>

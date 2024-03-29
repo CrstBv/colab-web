@@ -3,10 +3,10 @@ import { useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import { Placeholder } from "./file-browser";
 import { FileCard } from "./file-card";
-import { useGetOrgIdUserId } from "./overview-content";
+import { GetOrgIdUserId } from "./overview-content";
 
 export function FilesCollection() {
-  const orgId = useGetOrgIdUserId();
+  const orgId = GetOrgIdUserId();
 
   const lastFiles = useQuery(
     api.files.getLastFiles,

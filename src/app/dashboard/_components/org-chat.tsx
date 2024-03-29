@@ -4,16 +4,17 @@ import { useQuery } from "convex/react";
 import { useEffect, useRef } from "react";
 import { api } from "../../../../convex/_generated/api";
 import { OrgMembers } from "../_components/org-members";
-import { useGetOrgIdUserId } from "../_components/overview-content";
+import { GetOrgIdUserId } from "../_components/overview-content";
 import { SendMessageForm } from "../_components/send-message-form";
 import { Button } from "@/components/ui/button";
 import { ChevronsRightIcon } from "lucide-react";
 import Link from "next/link";
+import { CreateOrganization } from "@clerk/nextjs";
 
 export default function OrgChat() {
     const chatContainerRef = useRef<HTMLDivElement>(null);
   
-    const orgId = useGetOrgIdUserId();
+    const orgId = GetOrgIdUserId();
   
     function scrollToBotton() {
       if (chatContainerRef.current) {
@@ -40,6 +41,9 @@ export default function OrgChat() {
     if(members?.length === 0) {
       return <div className="w-full h-[80vh] flex flex-col items-center justify-center">
         <h1 className="text-2xl font-semibold">Theres no one to chat with</h1>
+        <p>Create a new Organization </p>
+        <CreateOrganization />
+        <p> or </p>
         <Link href={"/dashboard/notes"}>
         <Button variant={"ghost"}>
           <ChevronsRightIcon /> Go to Notes Page

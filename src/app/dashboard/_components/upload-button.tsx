@@ -29,7 +29,7 @@ import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Doc } from "../../../../convex/_generated/dataModel";
-import { useGetOrgIdUserId } from "./overview-content";
+import { GetOrgIdUserId } from "./overview-content";
 
 const formSchema = z.object({
   title: z.string().min(1).max(200),
@@ -41,7 +41,7 @@ const formSchema = z.object({
 export function UploadButton() {
   const { toast } = useToast();
 
-  const orgId = useGetOrgIdUserId();
+  const orgId = GetOrgIdUserId();
   const generateUploadUrl = useMutation(api.files.generateUploadUrl);
 
   const form = useForm<z.infer<typeof formSchema>>({
