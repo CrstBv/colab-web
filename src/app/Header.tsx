@@ -1,12 +1,11 @@
 import { Button } from "@/components/ui/button";
 import {
-    OrganizationSwitcher,
-    SignInButton,
-    SignedIn,
-    SignedOut,
-    UserButton,
+  OrganizationSwitcher,
+  SignInButton,
+  SignedIn,
+  SignedOut,
+  UserButton,
 } from "@clerk/nextjs";
-import clsx from "clsx";
 import Image from "next/image";
 import Link from "next/link";
 import { FilesButton } from "./dashboard/side-nav";
@@ -27,10 +26,10 @@ export function Header() {
         <SignedIn>
           <FilesButton />
         </SignedIn>
-        
+
         <div className="flex gap-2">
           <OrganizationSwitcher />
-          <UserButton  afterSignOutUrl="/"/>
+          <UserButton afterSignOutUrl="/" />
           <SignedOut>
             <SignInButton>
               <Button>Sign In</Button>

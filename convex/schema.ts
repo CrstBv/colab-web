@@ -36,7 +36,8 @@ export default defineSchema({
     body: v.string(),
     orgId: v.string(),
     userId: v.id("users"),
-    fileId: v.optional(v.id("files")),
+    fileId: v.optional(v.id("_storage")),
+    type: v.optional(fileTypes)
   }).index("by_orgId", ["orgId"]),
   advises: defineTable({
     title: v.string(),

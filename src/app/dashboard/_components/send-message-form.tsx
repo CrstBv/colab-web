@@ -10,11 +10,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "convex/react";
-import { Loader2Icon } from "lucide-react";
+import { Loader2Icon, SendIcon } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { api } from "../../../../convex/_generated/api";
 import { GetOrgIdUserId } from "./overview-content";
+import { UploadFileMessage } from "./upload-message-file";
 
 const formSchema = z.object({
   body: z.string().min(1).max(200),
@@ -46,8 +47,7 @@ export function SendMessageForm() {
   }
 
   return (
-    <div className="flex items-center">
-      <div className="w-full">
+    <div className="flex flex-row items-center justify-between gap-1 py-1">
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
@@ -61,8 +61,8 @@ export function SendMessageForm() {
                   <FormControl>
                     <Input
                       {...field}
-                      placeholder="Write a new message"
-                      className="w-[580px]"
+                      placeholder="Write a message"
+                      className="w-[478px]"
                     />
                   </FormControl>
                   <FormMessage />
@@ -73,15 +73,15 @@ export function SendMessageForm() {
               type="submit"
               disabled={form.formState.isSubmitting}
               className="flex gap-1"
-            >
+              >
               {form.formState.isSubmitting && (
                 <Loader2Icon className="h-4 w-4 animate-spin" />
               )}
-              Send
+              <SendIcon className="w-4 h-4" />
             </Button>
           </form>
         </Form>
-      </div>
+            <UploadFileMessage />
     </div>
   );
 }

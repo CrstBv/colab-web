@@ -69,7 +69,7 @@ export default function OrgChat() {
               </h1>
               <div
                 ref={chatContainerRef}
-                className="w-[660px] h-[600px] overflow-y-scroll"
+                className="w-[660px] h-[600px] overflow-y-scroll border border-black"
               >
                 {getMessages?.map((message) => {
                   return <ChatMessage key={message._id} message={message} />;
